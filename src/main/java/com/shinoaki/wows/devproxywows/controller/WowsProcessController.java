@@ -2,6 +2,7 @@ package com.shinoaki.wows.devproxywows.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.shinoaki.wows.api.codec.HttpSend;
+import com.shinoaki.wows.api.codec.http.WowsHttpClanTools;
 import com.shinoaki.wows.api.codec.http.WowsHttpShipTools;
 import com.shinoaki.wows.api.error.HttpStatusException;
 import com.shinoaki.wows.api.type.WowsBattlesType;
@@ -22,6 +23,7 @@ import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.net.http.HttpClient;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -46,15 +48,21 @@ public class WowsProcessController {
         this.wowsProcessService = wowsProcessService;
     }
 
-    @Operation(summary = "返回请求地址", description = "dev类型下建议使用这个返回的数据请求后去调用解析接口")
+    @Operation(summary = "返回请求地址", description = "dev类型下建议使用这个返回的数据请求后去调用解析接口,vortex默认返回PVP数据,需要其他的自行关键词替换")
     @GetMapping(value = "user/ship/list/uri/{server}/server/{accountId}")
     public Mono<Map<String, String>> shipListUri(@PathVariable @Parameter(example = "asia", description = "所属服务器") String server,
                                                  @PathVariable @Parameter(example = "2022515210", description = "账号ID") long accountId) {
         WowsServer code = WowsServer.findCodeByNull(server);
         if (code != null) {
-            WowsHttpShipTools tools = new WowsHttpShipTools(new JsonUtils(), client, code, accountId);
-            return Mono.just(Map.of("dev", tools.developers("907d9c6bfc0d896a2c156e57194a97cf").shipListUri().toString(), "vortex",
-                    tools.vortex().shipListUri(WowsBattlesType.PVP).toString()));
+            JsonUtils utils = new JsonUtils();
+            WowsHttpShipTools tools = new WowsHttpShipTools(utils, client, code, accountId);
+            WowsHttpClanTools clanTools = new WowsHttpClanTools(utils, client, code);
+            Map<String, String> map = new HashMap<>();
+            map.put("dev", tools.developers(this.wowsConfig.getPublicKey()).shipListUri().toString());
+            map.put("devClan", clanTools.developers(this.wowsConfig.getPublicKey()).userSearchClanDevelopersUri(accountId).toString());
+            map.put("vortex", tools.vortex().shipListUri(WowsBattlesType.PVP).toString());
+            map.put("vortexClan", clanTools.vortex().userSearchClanVortexUri(accountId).toString());
+            return Mono.just(map);
         }
         return Mono.error(new HttpStatusException("服务器code不存在"));
     }
