@@ -53,7 +53,7 @@ public class WowsDevController {
     @Operation(summary = "搜索用户", description = "该接口反代了https://developers.wargaming.net/reference/all/wows/account/list,使用方式请参考该地址的文档")
     @Parameter(name = "search", description = "用户名", required = true, example = "JustOneSummer")
     @GetMapping("search/{server}/")
-    public Mono<JsonNode> searchUser(ServerHttpRequest request, @PathVariable String server) {
+    public Mono<JsonNode> searchUser(ServerHttpRequest request, @Parameter(example = "asia", required = true) @PathVariable String server) {
         WowsServer code = WowsServer.findCodeByNull(server);
         if (code != null) {
             return webClient.get()
@@ -74,7 +74,7 @@ public class WowsDevController {
     @Operation(summary = "账号信息", description = "该接口反代了https://api.worldofwarships.asia/wows/account/info/,使用方式请参考该地址的文档")
     @Parameter(name = "account_id", description = "用户id", required = true, example = "2022515210")
     @GetMapping("account/info/{server}/")
-    public Mono<JsonNode> accountInfo(ServerHttpRequest request, @PathVariable String server) {
+    public Mono<JsonNode> accountInfo(ServerHttpRequest request, @Parameter(example = "asia", required = true) @PathVariable String server) {
         WowsServer code = WowsServer.findCodeByNull(server);
         if (code != null) {
             String accountId = request.getQueryParams().getFirst(ID);
@@ -111,7 +111,7 @@ public class WowsDevController {
     @Operation(summary = "用户公会信息", description = "该接口反代了https://api.worldofwarships.asia/wows/clans/accountinfo/,使用方式请参考该地址的文档")
     @Parameter(name = "account_id", description = "用户id", required = true, example = "2022515210")
     @GetMapping("clans/accountinfo/{server}/")
-    public Mono<JsonNode> clansAccountInfo(ServerHttpRequest request, @PathVariable String server) {
+    public Mono<JsonNode> clansAccountInfo(ServerHttpRequest request, @Parameter(example = "asia", required = true) @PathVariable String server) {
         WowsServer code = WowsServer.findCodeByNull(server);
         if (code != null) {
             String accountId = request.getQueryParams().getFirst(ID);
@@ -145,7 +145,7 @@ public class WowsDevController {
     @Operation(summary = "用户船池信息", description = "该接口反代了https://api.worldofwarships.asia/wows/ships/stats/,使用方式请参考该地址的文档")
     @Parameter(name = "account_id", description = "用户id", required = true, example = "2022515210")
     @GetMapping("ships/stats/{server}/")
-    public Mono<JsonNode> shipsStats(ServerHttpRequest request, @PathVariable String server) {
+    public Mono<JsonNode> shipsStats(ServerHttpRequest request, @Parameter(example = "asia", required = true) @PathVariable String server) {
         WowsServer code = WowsServer.findCodeByNull(server);
         if (code != null) {
             String accountId = request.getQueryParams().getFirst(ID);
