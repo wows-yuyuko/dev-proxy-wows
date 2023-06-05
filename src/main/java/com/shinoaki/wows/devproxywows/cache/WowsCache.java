@@ -78,6 +78,7 @@ public class WowsCache {
                         if (attributes.creationTime().toInstant().isAfter(day)) {
                             //删除文件夹
                             Files.delete(info.toPath());
+                            log.info("删除缓存 {}", info.getPath());
                         }
                     } catch (IOException e) {
                         log.error("{} 缓存检测异常", info.getPath(), e);
