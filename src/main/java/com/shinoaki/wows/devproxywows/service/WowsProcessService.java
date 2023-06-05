@@ -7,6 +7,7 @@ import com.shinoaki.wows.api.developers.DevelopersUserShip;
 import com.shinoaki.wows.api.error.StatusException;
 import com.shinoaki.wows.api.pr.PrData;
 import com.shinoaki.wows.api.type.WowsBattlesType;
+import com.shinoaki.wows.api.vortex.VortexUserShip;
 import com.shinoaki.wows.devproxywows.model.view.UserInfoVO;
 import com.shinoaki.wows.devproxywows.model.wows.WowsInfo;
 import com.shinoaki.wows.devproxywows.utils.WowsCacheUtils;
@@ -46,48 +47,66 @@ public class WowsProcessService {
         }
     }
 
-
-    public Mono<UserInfoVO> userInfo(long accountId, JsonNode node, long shipId) {
+    public Mono<UserInfoVO> userInfoDev(long accountId, JsonNode node, long shipId) {
         try {
             DevelopersUserShip ship = DevelopersUserShip.parse(node);
             if (ship.accountId() <= 0) {
                 //隐藏了战绩,或者是查询不到
                 return Mono.just(new UserInfoVO(-1, List.of(), List.of()));
             }
-            Map<WowsBattlesType, ShipInfo> infoMap = new EnumMap<>(WowsBattlesType.class);
-            Map<WowsBattlesType, PrData> prMap = new EnumMap<>(WowsBattlesType.class);
-            Map<WowsBattlesType, ShipInfo> shipMap = new EnumMap<>(WowsBattlesType.class);
-            for (var entry : DevelopersUserShip.parse(node).toShipInfoMap().entrySet()) {
-                ShipInfo userInfo = null;
-                ShipInfo shipInfo = null;
-                PrData server = PrData.empty();
-                for (var list : entry.getValue()) {
-                    if (userInfo == null) {
-                        userInfo = list;
-                    } else {
-                        userInfo = userInfo.addition(list);
-                    }
-                    server = server.addition(list.battle().battle(), WowsCacheUtils.getPr(list.shipId()));
-                    if (list.shipId() == shipId) {
-                        shipInfo = list;
-                    }
-                }
-                infoMap.put(entry.getKey(), userInfo);
-                prMap.put(entry.getKey(), server);
-                shipMap.put(entry.getKey(), shipInfo);
-            }
-            //计算
-            List<WowsInfo> userInfoList = new ArrayList<>();
-            List<WowsInfo> shipInfoList = new ArrayList<>();
-            for (var entry : infoMap.entrySet()) {
-                userInfoList.add(WowsInfo.prInfo(entry.getKey(), prMap.get(entry.getKey()), entry.getValue()));
-            }
-            for (var entry : shipMap.entrySet()) {
-                shipInfoList.add(WowsInfo.prInfo(entry.getKey(), prMap.get(entry.getKey()), entry.getValue()));
-            }
-            return Mono.just(new UserInfoVO(accountId, userInfoList, shipInfoList));
+            return userInfo(accountId, shipId, ship.toShipInfoMap());
         } catch (StatusException | JsonProcessingException e) {
             return Mono.error(e);
         }
+    }
+
+    public Mono<UserInfoVO> userInfoVortex(long accountId, WowsBattlesType type, JsonNode node, long shipId) {
+        try {
+            VortexUserShip ship = VortexUserShip.parse(type, node);
+            if (ship.hiddenProfile()) {
+                //隐藏了战绩,或者是查询不到
+                return Mono.just(new UserInfoVO(-1, List.of(), List.of()));
+            }
+            return userInfo(accountId, shipId, Map.of(type, ship.toShipInfoList()));
+        } catch (StatusException | JsonProcessingException e) {
+            return Mono.error(e);
+        }
+    }
+
+
+    private Mono<UserInfoVO> userInfo(long accountId, long shipId, Map<WowsBattlesType, List<ShipInfo>> shipInfoMap) {
+        Map<WowsBattlesType, ShipInfo> infoMap = new EnumMap<>(WowsBattlesType.class);
+        Map<WowsBattlesType, PrData> prMap = new EnumMap<>(WowsBattlesType.class);
+        Map<WowsBattlesType, ShipInfo> shipMap = new EnumMap<>(WowsBattlesType.class);
+        for (var entry : shipInfoMap.entrySet()) {
+            ShipInfo userInfo = null;
+            ShipInfo shipInfo = null;
+            PrData server = PrData.empty();
+            for (var list : entry.getValue()) {
+                if (userInfo == null) {
+                    userInfo = list;
+                } else {
+                    userInfo = userInfo.addition(list);
+                }
+                server = server.addition(list.battle().battle(), WowsCacheUtils.getPr(list.shipId()));
+                if (list.shipId() == shipId) {
+                    shipInfo = list;
+                }
+            }
+            infoMap.put(entry.getKey(), userInfo);
+            prMap.put(entry.getKey(), server);
+            shipMap.put(entry.getKey(), shipInfo);
+        }
+        //计算
+        List<WowsInfo> userInfoList = new ArrayList<>();
+        List<WowsInfo> shipInfoList = new ArrayList<>();
+        for (var entry : infoMap.entrySet()) {
+            userInfoList.add(WowsInfo.prInfo(entry.getKey(), prMap.get(entry.getKey()), entry.getValue()));
+        }
+        for (var entry : shipMap.entrySet()) {
+            shipInfoList.add(WowsInfo.prInfo(entry.getKey(), prMap.get(entry.getKey()), entry.getValue()));
+        }
+        return Mono.just(new UserInfoVO(accountId, userInfoList, shipInfoList));
+
     }
 }

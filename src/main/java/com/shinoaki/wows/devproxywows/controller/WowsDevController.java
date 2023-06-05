@@ -3,6 +3,7 @@ package com.shinoaki.wows.devproxywows.controller;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.shinoaki.wows.api.type.WowsServer;
 import com.shinoaki.wows.devproxywows.cache.WowsCache;
+import com.shinoaki.wows.devproxywows.config.WebConfig;
 import com.shinoaki.wows.devproxywows.config.WowsConfig;
 import com.shinoaki.wows.devproxywows.utils.PathUtils;
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,7 +34,7 @@ public class WowsDevController {
     public static final String ID = "account_id";
     private final WebClient webClient = WebClient.builder().exchangeStrategies(
             //10MB
-            ExchangeStrategies.builder().codecs(codec -> codec.defaultCodecs().maxInMemorySize(10485760)).build()
+            ExchangeStrategies.builder().codecs(codec -> codec.defaultCodecs().maxInMemorySize(WebConfig.MAX_IN_MEMORY)).build()
     ).build();
 
     public WowsDevController(WowsConfig wowsConfig, WowsCache wowsCache) {
