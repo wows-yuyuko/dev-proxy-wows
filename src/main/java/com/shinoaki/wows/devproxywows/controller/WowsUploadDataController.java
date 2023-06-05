@@ -30,13 +30,16 @@ import java.util.UUID;
 public class WowsUploadDataController {
     public static final Logger log = LoggerFactory.getLogger(WowsUploadDataController.class);
 
-    @Operation(summary = "上传对局信息",description = "服务器列表:asia,eu,na")
+    @Operation(summary = "上传对局信息", description = "服务器列表:asia,eu,na")
     @PostMapping(value = "game/player", consumes = MediaType.APPLICATION_JSON_VALUE)
     public String uploadPlayerInfo(@RequestBody UserInfoValid valid) {
-        String uid =
-                System.getProperty("user.dir") + File.separator + "battle" + File.separator + LocalDate.now().format(DateTimeFormatter.ISO_DATE)
-                        + File.separator + UUID.randomUUID() + ".json";
-        try (FileOutputStream out = new FileOutputStream(uid)) {
+        String basePath = System.getProperty("user.dir") + File.separator + "battle" + File.separator + LocalDate.now().format(DateTimeFormatter.ISO_DATE);
+        String uid = basePath + File.separator + UUID.randomUUID() + ".json";
+        File file = new File(uid);
+        if (!file.exists()) {
+            new File(basePath).mkdirs();
+        }
+        try (FileOutputStream out = new FileOutputStream(file)) {
             out.write(new JsonUtils().toJson(valid).getBytes(StandardCharsets.UTF_8));
             out.flush();
         } catch (IOException e) {
