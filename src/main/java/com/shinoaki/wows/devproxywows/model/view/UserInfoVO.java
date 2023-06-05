@@ -1,5 +1,6 @@
 package com.shinoaki.wows.devproxywows.model.view;
 
+import com.shinoaki.wows.devproxywows.model.wows.WowsClanInfo;
 import com.shinoaki.wows.devproxywows.model.wows.WowsInfo;
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -12,6 +13,8 @@ import java.util.List;
 public record UserInfoVO(
         @Schema(description = "账号ID,-1表示隐藏了战绩")
         long accountId,
+        @Schema(description = "公会信息")
+        WowsClanInfo clanInfo,
         List<WowsInfo> userInfo,
 
         @Schema(description = "战舰信息")

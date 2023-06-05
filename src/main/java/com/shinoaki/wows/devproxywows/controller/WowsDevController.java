@@ -108,7 +108,7 @@ public class WowsDevController {
      * @param server  服务器
      * @return 空表示服务器不存在/或不支持
      */
-    @Operation(summary = "用户公会信息", description = "该接口反代了https://api.worldofwarships.asia/wows/clans/accountinfo/,使用方式请参考该地址的文档")
+    @Operation(summary = "用户公会信息-默认会追加extra=clan", description = "该接口反代了https://api.worldofwarships.asia/wows/clans/accountinfo/,使用方式请参考该地址的文档")
     @Parameter(name = "account_id", description = "用户id", required = true, example = "2022515210")
     @GetMapping("clans/accountinfo/{server}/")
     public Mono<JsonNode> clansAccountInfo(ServerHttpRequest request, @Parameter(example = "asia", required = true) @PathVariable String server) {
@@ -122,8 +122,12 @@ public class WowsDevController {
                     return Mono.just(node);
                 }
             }
+            String uri = PathUtils.httpMapByGet(this.wowsConfig.getKey(), request.getQueryParams());
+            if (!uri.contains("extra=")) {
+                uri = uri + "&extra=clan";
+            }
             return webClient.get()
-                    .uri(URI.create(code.api() + "/wows/clans/accountinfo/" + PathUtils.httpMapByGet(this.wowsConfig.getKey(), request.getQueryParams())))
+                    .uri(URI.create(code.api() + "/wows/clans/accountinfo/" + uri))
                     .exchangeToMono(resp -> resp.bodyToMono(JsonNode.class).flatMap(x -> {
                         if (status) {
                             this.wowsCache.clansAccountInfo(Long.parseLong(accountId), x);

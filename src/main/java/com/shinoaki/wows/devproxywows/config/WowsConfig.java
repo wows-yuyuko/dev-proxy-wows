@@ -18,6 +18,12 @@ public class WowsConfig {
     @Value("${wows.public-key}")
     private String publicKey;
 
+    /**
+     * 缓存路径,为空则使用默认的项目根路径的cache
+     */
+    @Value("${wows.cache.path}")
+    private String cachePath;
+
     public String getKey() {
         return key;
     }
@@ -32,5 +38,13 @@ public class WowsConfig {
 
     public void setPublicKey(String publicKey) {
         this.publicKey = publicKey;
+    }
+
+    public String getCachePath() {
+        return cachePath;
+    }
+
+    public void setCachePath(String cachePath) {
+        this.cachePath = cachePath;
     }
 }

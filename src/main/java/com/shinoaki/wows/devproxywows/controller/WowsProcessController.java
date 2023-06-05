@@ -23,6 +23,7 @@ import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.net.http.HttpClient;
+import java.nio.file.FileSystemException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -68,7 +69,7 @@ public class WowsProcessController {
     }
 
 
-    @Operation(summary = "查询用户信息和战舰信息", description = "返回空表示服务器不对,服务器列表:asia,eu,na")
+    @Operation(summary = "查询用户信息和战舰信息", description = "本接口不支持国服,国服请走上传解析,服务器列表:asia,eu,na")
     @GetMapping(value = "user/info/{server}/{accountId}/query/{shipId}")
     public Mono<UserInfoVO> userInfo(@PathVariable @Parameter(example = "asia", description = "所属服务器") String server, @PathVariable @Parameter(example =
             "2022515210", description = "账号ID") long accountId, @PathVariable @Parameter(example = "4276041424", description = "战舰ID") long shipId) {
@@ -79,14 +80,17 @@ public class WowsProcessController {
             if (status) {
                 JsonNode node = this.wowsCache.shipsStats(accountId);
                 if (node != null) {
-                    return this.wowsProcessService.userInfoDev(accountId, node, shipId);
+                    return this.wowsProcessService.userInfoDev(utils, accountId, node, shipId, this.wowsCache.clansAccountInfo(accountId));
                 }
             }
             WowsHttpShipTools tools = new WowsHttpShipTools(utils, client, code, accountId);
+            WowsHttpClanTools clanTools = new WowsHttpClanTools(utils, client, code);
             try {
                 JsonNode node = utils.parse(HttpSend.sendGet(client, tools.developers(this.wowsConfig.getKey()).shipListUri()));
+                JsonNode clan = utils.parse(HttpSend.sendGet(client, clanTools.developers(this.wowsConfig.getKey()).userSearchClanDevelopersUri(accountId)));
                 this.wowsCache.shipsStats(accountId, node);
-                return this.wowsProcessService.userInfoDev(accountId, node, shipId);
+                this.wowsCache.clansAccountInfo(accountId, clan);
+                return this.wowsProcessService.userInfoDev(utils, accountId, node, shipId, clan);
             } catch (IOException | HttpStatusException e) {
                 return Mono.error(e);
             } catch (InterruptedException e) {
@@ -98,23 +102,35 @@ public class WowsProcessController {
     }
 
 
-    @Operation(summary = "上传解析用户数据", description = "dev建议使用shipList返回的url去请求拿数据")
+    @Operation(summary = "上传解析用户数据", description = "根据请求地址给的类型url上传来解析,你也可以不走请求地址而且本地直接生成那个url地址,请求返回的数据不需要处理直接传给服务器解析")
     @PostMapping(value = "user/info/{server}/upload/{dataType}/data/{battleType}/battle/{accountId}/query/{shipId}", consumes =
             MediaType.MULTIPART_FORM_DATA_VALUE)
     public Mono<UserInfoVO> userData(@PathVariable @Parameter(example = "asia", description = "所属服务器") String server, @PathVariable @Parameter(example =
             "vortex", description = "数据类型[vortex,dev]") String dataType, @PathVariable @Parameter(example = "PVP", description = "数战斗数据类型[PVP,PVP_SOLO," +
             "RANK_SOLO]全大写等") String battleType, @PathVariable @Parameter(example = "2022515210", description = "账号ID") long accountId,
-                                     @PathVariable @Parameter(example = "4276041424", description = "战舰ID") long shipId,
-                                     @RequestPart(value = "files") FilePart file) {
+                                     @PathVariable @Parameter(example = "4276041424", description = "战舰ID") long shipId, @Parameter(description = "用户船列表接口的数据" +
+            ".json格式") @RequestPart(value = "files") FilePart userInfo,
+                                     @Parameter(description = "公会信息.json格式-不想用这个可以传个空的txt文件") @RequestPart(value = "clan") FilePart clan) {
         WowsServer code = WowsServer.findCodeByNull(server);
+        if (!userInfo.filename().endsWith(".json")) {
+            return Mono.error(new FileSystemException("文件格式异常!请使用json文件格式上传"));
+        }
         if (code != null) {
             JsonUtils utils = new JsonUtils();
             try {
-                var node = utils.parse(PathUtils.temp(file));
+                var node = utils.parse(PathUtils.temp(userInfo));
+                if (userInfo.filename().endsWith(".json")) {
+                    var clanNode = utils.parse(PathUtils.temp(clan));
+                    if ("dev".equalsIgnoreCase(dataType)) {
+                        return this.wowsProcessService.userInfoDev(utils, accountId, node, shipId, clanNode);
+                    } else {
+                        return this.wowsProcessService.userInfoVortex(accountId, WowsBattlesType.findCode(battleType), node, shipId, clanNode);
+                    }
+                }
                 if ("dev".equalsIgnoreCase(dataType)) {
-                    return this.wowsProcessService.userInfoDev(accountId, node, shipId);
+                    return this.wowsProcessService.userInfoDev(utils, accountId, node, shipId, null);
                 } else {
-                    return this.wowsProcessService.userInfoVortex(accountId, WowsBattlesType.findCode(battleType), node, shipId);
+                    return this.wowsProcessService.userInfoVortex(accountId, WowsBattlesType.findCode(battleType), node, shipId, null);
                 }
             } catch (IOException e) {
                 return Mono.error(e);
