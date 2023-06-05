@@ -17,7 +17,7 @@ public record UserInfoValid(
         List<BattleInfo> infoList) {
 
     public record BattleInfo(
-            @Schema(description = "玩家所属服务器")
+            @Schema(description = "玩家所属服务器,服务器列表:asia,eu,na,cn,ru")
             String server,
             @Schema(description = "玩家账号ID,机器人为0")
             long accountId,

@@ -1,0 +1,134 @@
+{
+  "AirCarrier": [
+    {
+      "code": 1,
+      "value": 60000,
+      "color": "#FE7903"
+    },
+    {
+      "code": 2,
+      "value": 71000,
+      "color": "#FE7903"
+    },
+    {
+      "code": 3,
+      "value": 84000,
+      "color": "#02C9B3"
+    },
+    {
+      "code": 4,
+      "value": 113000,
+      "color": "#A00DC5"
+    }
+  ],
+  "Battleship": [
+    {
+      "code": 1,
+      "value": 64000,
+      "color": "#FE7903"
+    },
+    {
+      "code": 2,
+      "value": 72000,
+      "color": "#44B300"
+    },
+    {
+      "code": 3,
+      "value": 97000,
+      "color": "#02C9B3"
+    },
+    {
+      "code": 4,
+      "value": 108000,
+      "color": "#A00DC5"
+    }
+  ],
+  "Destroyer": [
+    {
+      "code": 1,
+      "value": 33000,
+      "color": "#FE7903"
+    },
+    {
+      "code": 2,
+      "value": 40000,
+      "color": "#44B300"
+    },
+    {
+      "code": 3,
+      "value": 55000,
+      "color": "#02C9B3"
+    },
+    {
+      "code": 4,
+      "value": 64000,
+      "color": "#A00DC5"
+    }
+  ],
+  "Cruiser": [
+    {
+      "code": 1,
+      "value": 47000,
+      "color": "#FE7903"
+    },
+    {
+      "code": 2,
+      "value": 55000,
+      "color": "#44B300"
+    },
+    {
+      "code": 3,
+      "value": 83000,
+      "color": "#02C9B3"
+    },
+    {
+      "code": 4,
+      "value": 95000,
+      "color": "#A00DC5"
+    }
+  ],
+  "Submarine": [
+    {
+      "code": 1,
+      "value": 70000,
+      "color": "#FE7903"
+    },
+    {
+      "code": 2,
+      "value": 70000,
+      "color": "#44B300"
+    },
+    {
+      "code": 3,
+      "value": 70000,
+      "color": "#02C9B3"
+    },
+    {
+      "code": 4,
+      "value": 70000,
+      "color": "#A00DC5"
+    }
+  ],
+  "Auxiliary": [
+    {
+      "code": 1,
+      "value": 60000,
+      "color": "#FE7903"
+    },
+    {
+      "code": 2,
+      "value": 71000,
+      "color": "#FE7903"
+    },
+    {
+      "code": 3,
+      "value": 84000,
+      "color": "#02C9B3"
+    },
+    {
+      "code": 4,
+      "value": 113000,
+      "color": "#A00DC5"
+    }
+  ]
+}

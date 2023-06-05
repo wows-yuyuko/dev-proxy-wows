@@ -1,0 +1,32 @@
+[
+  {
+    "code": 1,
+    "value": 40,
+    "color": "#f44336"
+  },
+  {
+    "code": 2,
+    "value": 45,
+    "color": "#ff9800"
+  },
+  {
+    "code": 3,
+    "value": 50,
+    "color": "#8bc34a"
+  },
+  {
+    "code": 4,
+    "value": 55,
+    "color": "#00bcd4"
+  },
+  {
+    "code": 5,
+    "value": 60,
+    "color": "#9c27b0"
+  },
+  {
+    "code": 6,
+    "value": 65,
+    "color": "#673ab7"
+  }
+]

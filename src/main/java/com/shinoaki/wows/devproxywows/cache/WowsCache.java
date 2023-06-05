@@ -104,7 +104,11 @@ public class WowsCache {
     private void writer(long accountId, String module, JsonNode node) {
         String path = path(accountId, module);
         JsonUtils utils = new JsonUtils();
-        try (FileOutputStream out = new FileOutputStream(new File(path))) {
+        File file = new File(path);
+        if (!file.exists()){
+            new File(path.substring(0,path.lastIndexOf(File.separator))).mkdirs();
+        }
+        try (FileOutputStream out = new FileOutputStream(file)) {
             out.write(utils.toJson(node).getBytes(StandardCharsets.UTF_8));
             out.flush();
         } catch (IOException e) {

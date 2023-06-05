@@ -1,0 +1,65 @@
+[
+  {
+    "code": 0,
+    "value": 0,
+    "name": "暂无数据",
+    "englishName": "No Rating",
+    "color": "#828282"
+  },
+  {
+    "code": 1,
+    "value": 750,
+    "name": "还需努力",
+    "englishName": "Bad",
+    "color": "#FE0E00"
+  },
+  {
+    "code": 2,
+    "value": 1100,
+    "name": "低于平均",
+    "englishName": "Below Average",
+    "color": "#FE7903"
+  },
+  {
+    "code": 3,
+    "value": 1350,
+    "name": "平均水平",
+    "englishName": "Average",
+    "color": "#FFC71F"
+  },
+  {
+    "code": 4,
+    "value": 1550,
+    "name": "好",
+    "englishName": "Good",
+    "color": "#44B300"
+  },
+  {
+    "code": 5,
+    "value": 1750,
+    "name": "很好",
+    "englishName": "Very Good",
+    "color": "#318000"
+  },
+  {
+    "code": 6,
+    "value": 2100,
+    "name": "非常好",
+    "englishName": "Great",
+    "color": "#02C9B3"
+  },
+  {
+    "code": 7,
+    "value": 2450,
+    "name": "大佬水平",
+    "englishName": "Unicum",
+    "color": "#D042F3"
+  },
+  {
+    "code": 8,
+    "value": 2450,
+    "name": "神佬水平",
+    "englishName": "Super Unicum",
+    "color": "#A00DC5"
+  }
+]
